@@ -10,13 +10,11 @@ It will also update its cookie when CouchDB sends a new cookie in the headers.
 
 ### Usage
 ```
-var Hapi = require('hapi');
-var server = new Hapi.Server();
-var options = { nano: { db: 'testDb' } };
+const Hapi = require('hapi');
+const server = new Hapi.Server({ port: 80 });
+const options = { nano: { db: 'testDb' } };
 
-server.connection({ port: 80 });
-
-server.register({ register: require('hapi-relax'), options }, function(err) {
+server.register({ plugin: require('hapi-relax'), options }).then((err) => {
 });
 
 server.start();
@@ -62,13 +60,12 @@ required if the plugin is registered multiple times e.g. for multiple databases 
 
 ### Example
 ```
-var Hapi = require('hapi');
+const Hapi = require('hapi');
 
-var server = new Hapi.Server();
-server.connection({ port: 8080 });
+const server = new Hapi.Server({ port: 8080 });
 
-var plugins = [{
-  register: require('hapi-relax'),
+const plugins = [{
+  plugin: require('../index'),
   options: {
     nano: {
       url: 'http://localhost:5984',
@@ -79,7 +76,7 @@ var plugins = [{
   }
 },
 {
-  register: require('hapi-relax'),
+  plugin: require('../index'),
   options: {
     nano: {
       url: 'http://localhost:5984',
@@ -91,23 +88,21 @@ var plugins = [{
   }
 }];
 
-server.register(plugins, function (err) {
-  if (err) {
+server.register(plugins).then((err) => {
     throw err;
-  }
 });
 
 server.route({
     method: 'GET',
     path: '/db1/{key}',
-    handler: function (request, reply) {
-      var key = encodeURIComponent(request.params.key);
+    handler(request, h) {
+      const key = encodeURIComponent(request.params.key);
       server.methods.nano.get(key, function (err, body, headers) {
         if (err && err.reason === 'missing') {
-          reply('Document does not exist').code(404);
+          return h.response('Document does not exist').code(404);
         }
         else {
-          reply(body);
+          return body;
         }
       });
     }
@@ -116,21 +111,22 @@ server.route({
 server.route({
     method: 'GET',
     path: '/db2/{key}',
-    handler: function (request, reply) {
-      var key = encodeURIComponent(request.params.key);
+    handler(request, h) {
+      const key = encodeURIComponent(request.params.key);
       server.methods.db2.get(key, function (err, body, headers) {
         if (err && err.reason === 'missing') {
-          reply('Document does not exist').code(404);
+          return h.response('Document does not exist').code(404);
         }
         else {
-          reply(body);
+          return body;
         }
       });
     }
 });
 
-server.start(function () {
-  console.log('Server running at:', server.info.uri);
+server.start().then(() => {
+    console.log('Server running at:', server.info.uri);
+}).catch((err) => {
+    throw err;
 });
 ```
-
