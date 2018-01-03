@@ -2,7 +2,7 @@ module.exports = {
   'plugins': {
     'a': [
       {
-        'register': require('../index'),
+        'plugin': require('../index'),
         'options': {
           'nano': {
             'url': 'http://localhost:5984',
@@ -13,7 +13,7 @@ module.exports = {
         }
       },
       {
-        'register': require('../index'),
+        'plugin': require('../index'),
         'options': {
           'nano': {
             'url': 'http://localhost:5984',
@@ -27,7 +27,7 @@ module.exports = {
     ],
     'b': [
       {
-        'register': require('../index'),
+        'plugin': require('../index'),
         'options': {
           'nano': {
             'url': 'http://localhost:5984',
@@ -39,7 +39,7 @@ module.exports = {
         }
       },
       {
-        'register': require('../index'),
+        'plugin': require('../index'),
         'options': {
           'nano': {
             'url': 'http://localhost:5984',
@@ -53,7 +53,7 @@ module.exports = {
     ],
     'c': [
       {
-        'register': require('../index'),
+        'plugin': require('../index'),
         'options': {
           'nano': {
             'url': 'http://localhost:5984',
