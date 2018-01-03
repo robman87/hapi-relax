@@ -1,10 +1,9 @@
-var Hapi = require('hapi');
+const Hapi = require('hapi');
 
-var server = new Hapi.Server();
-server.connection({ port: 8080 });
+const server = new Hapi.Server({ port: 8080 });
 
-var plugins = [{
-  register: require('../index'),
+const plugins = [{
+  plugin: require('../index'),
   options: {
     nano: {
       url: 'http://localhost:5984',
@@ -15,7 +14,7 @@ var plugins = [{
   }
 },
 {
-  register: require('../index'),
+  plugin: require('../index'),
   options: {
     nano: {
       url: 'http://localhost:5984',
@@ -27,23 +26,21 @@ var plugins = [{
   }
 }];
 
-server.register(plugins, function (err) {
-  if (err) {
+server.register(plugins).then((err) => {
     throw err;
-  }
 });
 
 server.route({
     method: 'GET',
     path: '/db1/{key}',
-    handler: function (request, reply) {
-      var key = encodeURIComponent(request.params.key);
+    handler(request, h) {
+      const key = encodeURIComponent(request.params.key);
       server.methods.nano.get(key, function (err, body, headers) {
         if (err && err.reason === 'missing') {
-          reply('Document does not exist').code(404);
+          return h.response('Document does not exist').code(404);
         }
         else {
-          reply(body);
+          return body;
         }
       });
     }
@@ -52,19 +49,21 @@ server.route({
 server.route({
     method: 'GET',
     path: '/db2/{key}',
-    handler: function (request, reply) {
-      var key = encodeURIComponent(request.params.key);
+    handler(request, h) {
+      const key = encodeURIComponent(request.params.key);
       server.methods.db2.get(key, function (err, body, headers) {
         if (err && err.reason === 'missing') {
-          reply('Document does not exist').code(404);
+          return h.response('Document does not exist').code(404);
         }
         else {
-          reply(body);
+          return body;
         }
       });
     }
 });
 
-server.start(function () {
-  console.log('Server running at:', server.info.uri);
+server.start().then(() => {
+    console.log('Server running at:', server.info.uri);
+}).catch((err) => {
+    throw err;
 });
