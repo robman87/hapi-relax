@@ -31,8 +31,8 @@
     "url": "https://github.com/accosine/hapi-relax/issues"
   },
   "dependencies": {
-    "hoek": "^5.0.2",
-    "nano": "^6.4.2"
+    "cloudant-nano": "^6.7.0",
+    "hoek": "^5.0.2"
   },
   "devDependencies": {
     "code": "^5.1.2",
