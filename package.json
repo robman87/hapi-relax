@@ -31,15 +31,18 @@
     "url": "https://github.com/accosine/hapi-relax/issues"
   },
   "dependencies": {
-    "hoek": "^5.0.2",
-    "nano": "^6.4.2"
+    "hoek": "^6.1.2",
+    "nano": "^8.0.0"
+  },
+  "peerDependencies": {
+    "hapi": ">= 17"
   },
   "devDependencies": {
-    "code": "^5.1.2",
-    "codeclimate-test-reporter": "^0.5.0",
-    "eslint": "^4.14.0",
-    "hapi": "^17.2.0",
-    "lab": "^15.1.2",
-    "nock": "^9.1.5"
+    "code": "^5.2.4",
+    "codeclimate-test-reporter": "^0.5.1",
+    "eslint": "^5.15.1",
+    "hapi": "^17.8.4",
+    "lab": "^15.5.0",
+    "nock": "^9.6.1"
   }
 }

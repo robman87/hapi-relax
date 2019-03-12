@@ -14,46 +14,45 @@ nockBack.fixtures = path.join(__dirname, 'fixtures');
 lab.experiment('Plugin registration', function() {
   var server;
 
-  lab.beforeEach(function (done) {
+  lab.beforeEach(function () {
     server = new Hapi.Server();
-    done();
   });
 
-  lab.test('Plugin loads successfully', function (done) {
-    server.register(plugins.a, function (err) {
-      Code.expect(err).to.be.undefined();
-      Code.expect(server.methods.nano).to.be.object();
-      Code.expect(server.methods.customPrefix).to.be.object();
-      Code.expect(server.methods.nano).to.not.deep.equal(server.methods.customPrefix);
-      done();
-    });
+  lab.test('Plugin loads successfully', function () {
+    return server.register(plugins.a)
+      .then(function() {
+        Code.expect(server.methods.nano).to.be.object();
+        Code.expect(server.methods.customPrefix).to.be.object();
+        Code.expect(server.methods.nano).to.not.equal(server.methods.customPrefix);
+      })
+      .catch(function(err) {
+        Code.expect(true).to.equal(false);
+      });
   });
 
-  lab.test('Plugin returns error when same prefix is used twice', function (done) {
-    server.register(plugins.a.concat(plugins.b), function (err) {
-      var expErr = 'Error: There is already a plugin registered with the prefix' +
+  lab.test('Plugin returns error when same prefix is used twice', function () {
+    return server.register(plugins.a.concat(plugins.b))
+      .then(function() {
+        Code.expect(true).to.equal(false);
+      })
+      .catch(function (err) {
+        var expErr = 'Error: There is already a plugin registered with the prefix' +
                    ' \'customPrefix\'';
-      Code.expect(err).to.be.an.instanceof(Error);
-      Code.expect(err.toString()).to.equal(expErr);
-      done();
-    });
+        Code.expect(err).to.be.an.instanceof(Error);
+        Code.expect(err.toString()).to.equal(expErr);
+      });
   });
 });
 
 lab.experiment('Server methods', function() {
   var server = new Hapi.Server();
 
-  lab.before(function (done) {
-    server.register(plugins.b, function (err) {
-      if (err) {
-        throw err;
-      }
-      done();
-    });
+  lab.before(function () {
+    return server.register(plugins.b);
   });
 
-  lab.test('Get method returns document', function (done) {
-    nockBack('getDoc0.json', function (nockDone) {
+  lab.test('Get method returns document', function () {
+    return nockBack('getDoc0.json').then(function(result) {
       server.methods.customPrefix.get('doc0', function (err, body, headers) {
         Code.expect(err).to.be.null();
         Code.expect(body).to.be.object();
@@ -63,10 +62,15 @@ lab.experiment('Server methods', function() {
         Code.expect(body._id).to.be.string();
         Code.expect(body._id).to.equal('doc0');
         Code.expect(body.content).to.equal('Hello universe!');
-        Nock.cleanAll();
-        nockDone();
-        done();
-      });
+        //Nock.cleanAll();
+        // nockDone();
+      })
+        .then(function (result) {
+          nockDone();
+        })
+        .catch(function(err) {
+          nockDone(err)
+        });
     });
   });
 
@@ -137,7 +141,7 @@ lab.experiment('Authentication', function() {
     });
   });
 
-    lab.test('Get method returns error when credentials are wrong', function (done) {
+  lab.test('Get method returns error when credentials are wrong', function (done) {
       nockBack('auth.json', function (nockDone) {
         server.methods.wrongPw.get('doc1', function (err, body, headers) {
           Code.expect(err).to.be.an.instanceof(Error);
@@ -165,9 +169,9 @@ lab.experiment('Authentication', function() {
         Code.expect(headers.statusCode).to.equal(200);
         Code.expect(body.db_name).to.equal('test2');
         server.methods.customPrefix.info(function (err, body, headers) {
-          Code.expect(err).to.deep.equal(err1);
-          Code.expect(body).to.deep.equal(body1);
-          Code.expect(headers).to.deep.equal(headers1);
+          Code.expect(err).to.equal(err1);
+          Code.expect(body).to.equal(body1);
+          Code.expect(headers).to.equal(headers1);
           Nock.cleanAll();
           nockDone();
           done();
@@ -190,8 +194,8 @@ lab.experiment('Authentication', function() {
         Code.expect(body.db_name).to.equal('test2');
         setTimeout(function () {
           server.methods.customPrefix.info(function (err, body, headers) {
-            Code.expect(err).to.deep.equal(err1);
-            Code.expect(body).to.deep.equal(body1);
+            Code.expect(err).to.equal(err1);
+            Code.expect(body).to.equal(body1);
             Code.expect(headers['set-cookie']).to.be.array();
             Nock.cleanAll();
             nockDone();
