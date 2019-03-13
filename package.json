@@ -42,6 +42,7 @@
     "codeclimate-test-reporter": "^0.5.1",
     "eslint": "^5.15.1",
     "hapi": "^17.8.4",
+    "boom": "^7.3.0",
     "lab": "^15.5.0",
     "nock": "^9.6.1"
   }
